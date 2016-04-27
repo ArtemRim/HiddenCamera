@@ -47,6 +47,9 @@ namespace HiddenCamera
 			// aapt resource value: 0x7f020000
 			public const int Icon = 2130837504;
 			
+			// aapt resource value: 0x7f020001
+			public const int undefined = 2130837505;
+			
 			static Drawable()
 			{
 				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
@@ -60,8 +63,44 @@ namespace HiddenCamera
 		public partial class Id
 		{
 			
+			// aapt resource value: 0x7f050005
+			public const int btn_create_session = 2131034117;
+			
+			// aapt resource value: 0x7f050006
+			public const int btn_show_session = 2131034118;
+			
+			// aapt resource value: 0x7f050007
+			public const int cell = 2131034119;
+			
+			// aapt resource value: 0x7f050008
+			public const int icon = 2131034120;
+			
+			// aapt resource value: 0x7f050009
+			public const int item = 2131034121;
+			
+			// aapt resource value: 0x7f05000c
+			public const int layout = 2131034124;
+			
+			// aapt resource value: 0x7f050002
+			public const int layoutBase = 2131034114;
+			
+			// aapt resource value: 0x7f05000a
+			public const int layoutmain = 2131034122;
+			
+			// aapt resource value: 0x7f050004
+			public const int listView = 2131034116;
+			
 			// aapt resource value: 0x7f050000
-			public const int MyButton = 2131034112;
+			public const int relativeLayout1 = 2131034112;
+			
+			// aapt resource value: 0x7f050001
+			public const int scrollView = 2131034113;
+			
+			// aapt resource value: 0x7f05000b
+			public const int scrollview = 2131034123;
+			
+			// aapt resource value: 0x7f050003
+			public const int textView = 2131034115;
 			
 			static Id()
 			{
@@ -77,7 +116,19 @@ namespace HiddenCamera
 		{
 			
 			// aapt resource value: 0x7f030000
-			public const int Main = 2130903040;
+			public const int Camera = 2130903040;
+			
+			// aapt resource value: 0x7f030001
+			public const int ListSession = 2130903041;
+			
+			// aapt resource value: 0x7f030002
+			public const int Main = 2130903042;
+			
+			// aapt resource value: 0x7f030003
+			public const int row_session = 2130903043;
+			
+			// aapt resource value: 0x7f030004
+			public const int Session = 2130903044;
 			
 			static Layout()
 			{
@@ -92,11 +143,26 @@ namespace HiddenCamera
 		public partial class String
 		{
 			
-			// aapt resource value: 0x7f040001
-			public const int ApplicationName = 2130968577;
+			// aapt resource value: 0x7f040005
+			public const int ApplicationName = 2130968581;
+			
+			// aapt resource value: 0x7f040004
+			public const int ChooseSession = 2130968580;
 			
 			// aapt resource value: 0x7f040000
-			public const int Hello = 2130968576;
+			public const int CreateSession = 2130968576;
+			
+			// aapt resource value: 0x7f040002
+			public const int NameSession = 2130968578;
+			
+			// aapt resource value: 0x7f040003
+			public const int ReturnToMenu = 2130968579;
+			
+			// aapt resource value: 0x7f040001
+			public const int StartSession = 2130968577;
+			
+			// aapt resource value: 0x7f040006
+			public const int sessionsList = 2130968582;
 			
 			static String()
 			{

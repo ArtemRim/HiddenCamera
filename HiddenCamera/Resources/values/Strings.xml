@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="Hello">Hello World, Click Me!</string>
-    <string name="ApplicationName">HiddenCamera</string>
+  <string name="CreateSession">Новая сессия</string>
+  <string name="StartSession">Начать сессию</string>
+  <string name="NameSession">Введите название сессии</string>
+  <string name="ReturnToMenu">Вернуться в меню</string>
+  <string name="ChooseSession">Выбрать сессию</string>
+  <string name="ApplicationName">HiddenCamera</string>
+  <string name="sessionsList">List of all session</string>
 </resources>
