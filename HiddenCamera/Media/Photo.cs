@@ -74,13 +74,12 @@ namespace HiddenCamera.Media
         }
 
 
-        public static SurfaceView CreateSurfaceView(CameraActivity context)
+        public static SurfaceView CreateSurfaceView(Activity context)
         {
             SurfaceView surfaceView = new SurfaceView(context)
             {
                 LayoutParameters = new ViewGroup.LayoutParams(1, 1),
             };
-            context.layout.AddView(surfaceView);
             return surfaceView;
         }
 

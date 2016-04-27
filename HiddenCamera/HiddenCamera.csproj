@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activities\CameraActivity.cs" />
+    <Compile Include="Activities\HiddenModeActivity.cs" />
     <Compile Include="Activities\ReviewSessionsActivity.cs" />
     <Compile Include="Activities\SessionActivity.cs" />
     <Compile Include="Adapter\SessionArrayAdapter.cs" />
@@ -77,6 +78,9 @@
       <SubType>AndroidResource</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\Camera.axml">
+      <SubType>AndroidResource</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\hidden_mode.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
   </ItemGroup>

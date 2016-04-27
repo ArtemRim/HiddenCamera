@@ -40,6 +40,7 @@ namespace HiddenCamera.Activities
         Video video;
 
         private string sessionPath;
+
         int countVideo = 0;
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -54,7 +55,9 @@ namespace HiddenCamera.Activities
             SetOnLayoutClickEvent();
             SetOnLayoutLongClickEvent();
             //  SetOnTouchLayoutEvents();
+ 
         }
+
 
 
         private void SetOnLayoutLongClickEvent()
@@ -214,7 +217,9 @@ namespace HiddenCamera.Activities
         {
             if (isCallbacFunckDelete)
                 surfaceHolder.RemoveCallback(this);
-            surfaceHolder = Photo.CreateSurfaceView(this).Holder;
+            SurfaceView surfaceView = Photo.CreateSurfaceView(this);
+            layout.AddView(surfaceView);
+            surfaceHolder = surfaceView.Holder;
             surfaceHolder.AddCallback(this);
             surfaceHolder.SetType(SurfaceType.PushBuffers);
         }
@@ -243,8 +248,8 @@ namespace HiddenCamera.Activities
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            //if (video!=null)
-            //   video.Dispose();
+            if (video!=null)
+               video.Dispose();
         }
 
 

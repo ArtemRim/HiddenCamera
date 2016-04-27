@@ -11,12 +11,20 @@ namespace HiddenCamera.Activities
     [Activity(Label = "HiddenCamera", MainLauncher = true, Icon = "@drawable/icon")]
     public class MainActivity : Activity
     {
+        private const int MENU_HIDDEN_MODE = 113;
+        private const int MENU_OPEN_MODE = 114;
+
+        private Button buttonShow;
+        private Button buttonCreate;
+
+        private String sessionName;
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.Main);
-            Button buttonCreate = FindViewById<Button>(Resource.Id.btn_create_session);
-            Button buttonShow = FindViewById<Button>(Resource.Id.btn_show_session);
+            buttonCreate = FindViewById<Button>(Resource.Id.btn_create_session);
+            buttonShow = FindViewById<Button>(Resource.Id.btn_show_session);
+            this.RegisterForContextMenu(buttonCreate);
             buttonCreate.Click += delegate
             {
                 CreateAlertDialog();
@@ -27,9 +35,29 @@ namespace HiddenCamera.Activities
             };
         }
 
-        private void PassDataToCameraActivity(String sessionName)
+        public override void OnCreateContextMenu(IContextMenu menu, View v, IContextMenuContextMenuInfo menuInfo)
         {
-            Intent intent = new Intent(this, typeof(CameraActivity));
+            menu.Add(0, MENU_HIDDEN_MODE, 0, GetString(Resource.String.menu_hidden_mode));
+            menu.Add(0, MENU_OPEN_MODE, 0, GetString(Resource.String.menu_open_mode));
+            base.OnCreateContextMenu(menu, v, menuInfo);
+        }
+
+        public override bool OnContextItemSelected(IMenuItem item)
+        {
+            switch(item.ItemId)
+            {
+                case MENU_HIDDEN_MODE:
+                    PassDataToCameraActivity(sessionName, new Intent(this, typeof(HiddenModeActivity)));
+                    break;
+                case MENU_OPEN_MODE:
+                    PassDataToCameraActivity(sessionName,new Intent(this, typeof(CameraActivity)));
+                    break;
+            }
+            return base.OnContextItemSelected(item);
+        }
+
+        private void PassDataToCameraActivity(String sessionName,Intent intent)
+        {
             intent.PutExtra("sessionName", sessionName);
             StartActivity(intent);
         }
@@ -44,8 +72,9 @@ namespace HiddenCamera.Activities
             dialog.SetView(edit);
             dialog.SetButton(GetString(Resource.String.StartSession), (s, ev) =>
             {
-                String sessionName = edit.Text.ToString();
-                PassDataToCameraActivity(sessionName);
+                sessionName = edit.Text.ToString();
+                OpenContextMenu(buttonCreate);
+                
             });
             dialog.SetButton2(GetString(Resource.String.ReturnToMenu), (s, ev) =>
             {
@@ -53,6 +82,7 @@ namespace HiddenCamera.Activities
             dialog.Show();
         }
 
+        
 
 
         private EditText CreateEditText()
