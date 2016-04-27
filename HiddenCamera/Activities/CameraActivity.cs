@@ -47,14 +47,13 @@ namespace HiddenCamera.Activities
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.Camera);           
-            GetSessionName();
             sessionPath = File.CreateDirectory(GetSessionName(), 0);
             layout = FindViewById<Android.Widget.LinearLayout>(Resource.Id.layoutBase);
             if (surfaceHolder == null)
                 SetSurfaceHolder(false);
             SetOnLayoutClickEvent();
             SetOnLayoutLongClickEvent();
-            //  SetOnTouchLayoutEvents();
+            SetOnTouchLayoutEvents();
  
         }
 

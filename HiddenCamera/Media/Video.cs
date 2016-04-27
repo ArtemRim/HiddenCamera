@@ -56,6 +56,7 @@ namespace HiddenCamera.Media
         public void SetRecorderPreview()
         {
             recorder.SetPreviewDisplay(SufaceHolder.Surface);
+            //.recorder.SetPreviewDisplay(null);
             recorder.Prepare();
         }
 
