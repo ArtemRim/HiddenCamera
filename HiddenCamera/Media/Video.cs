@@ -22,11 +22,12 @@ namespace HiddenCamera.Media
 
         private MediaRecorder recorder;
         private Android.Hardware.Camera camera;
-        public string path;
+        private const String format = ".mp4";
+        public String path;
         public ISurfaceHolder SufaceHolder;
         public bool startRecord;
 
-        public Video(string format, string sessionPath)
+        public Video(String sessionPath)
         {
             startRecord = false;
             this.path = GetPathFile(sessionPath, format);
@@ -67,7 +68,7 @@ namespace HiddenCamera.Media
             recorder.SetCamera(camera);
             recorder.SetVideoSource(VideoSource.Camera);
             recorder.SetAudioSource(AudioSource.Mic);
-            recorder.SetOutputFormat(OutputFormat.Default);
+            recorder.SetOutputFormat(OutputFormat.Mpeg4);
             recorder.SetVideoEncoder(VideoEncoder.H264);
             recorder.SetAudioEncoder(AudioEncoder.AmrNb);
             recorder.SetOutputFile(path);

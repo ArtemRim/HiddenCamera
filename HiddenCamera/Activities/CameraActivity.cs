@@ -285,7 +285,7 @@ namespace HiddenCamera.Activities
             {
                 if (!cameraWasClosed)
                     CameraClose(false);
-                video = new Video(".mp4", sessionPath);
+                video = new Video(sessionPath);
                 video.SufaceHolder = Photo.CreateSurfaceView(this).Holder;
                 StartTimer(ref timerUpdateVideoView, timerUpdateVideoView_Elapsed);
                 cameraWasClosed = true;

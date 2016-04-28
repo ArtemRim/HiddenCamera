@@ -7,13 +7,31 @@
     android:minHeight="25px"
     android:id="@+id/layout">
     <Button
-        android:text="Button"
+        android:text="@string/start_record"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:id="@+id/button1"
+        android:background="@drawable/roundedbutton"
+        android:layout_margin="125dp" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:minWidth="25px"
+        android:minHeight="25px"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/button1" />
-    <Button
-        android:text="Button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/button2" />
+        android:weightSum="2"
+        android:id="@+id/linearLayout1">
+        <RadioButton
+            android:text="Видео"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/radioButton_video"
+            android:layout_weight="1" />
+        <RadioButton
+            android:text="Фото"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/radioButton_photo"
+            android:layout_weight="1" />
+    </LinearLayout>
 </LinearLayout>

@@ -9,4 +9,6 @@
   <string name="sessionsList">List of all session</string>
   <string name="menu_hidden_mode">Съемка в скрытом режиме</string>
   <string name="menu_open_mode">Съемка в режиме просмотра</string>
+  <string name="start_record">Старт</string>
+  <string name="stop_record">Стоп</string>
 </resources>

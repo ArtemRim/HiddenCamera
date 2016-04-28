@@ -17,63 +17,158 @@ using Android.Graphics;
 namespace HiddenCamera.Activities
 {
     [Activity(Label = "HiddenActivity")]
-    public class HiddenModeActivity : Activity,ISurfaceHolderCallback
+    public class HiddenModeActivity : Activity, ISurfaceHolderCallback, Android.Hardware.Camera.IPictureCallback
     {
         private String sessionPath;
-        private Button buttonStart,buttonStop;
+        private Button buttonStart;
         private LinearLayout layout;
+        private RadioButton radio_video,radio_photo;
         private Video video;
-        private Timer timerUpdateVideoView, timerUpdateSurface;
+
         private ISurfaceHolder surfaceHolder;
         private Android.Hardware.Camera camera;
-        private bool previewing = false, cameraWasClosed = false,start = false;
+        private bool previewing = false, cameraWasClosed = false, start = false, isRecording=false;
+        private const int DIALOG_TIME = 11;
+
+
+        int myHour = 14;
+        int myMinute = 35;
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.hidden_mode);
             sessionPath = File.CreateDirectory(GetSessionName(), 0);
             buttonStart = FindViewById<Button>(Resource.Id.button1);
+            radio_video = FindViewById<RadioButton>(Resource.Id.radioButton_video);
+            radio_photo = FindViewById<RadioButton>(Resource.Id.radioButton_photo);
             layout = FindViewById<LinearLayout>(Resource.Id.layout);
+
             SetSurfaceHolder(false);
-            buttonStart.Click += delegate
-            {
-                try
-                {
-                    StartVideoRecord();
-                }
-                catch { throw new Exception("on click event"); }
-            };
-            buttonStop = FindViewById<Button>(Resource.Id.button2);
-            buttonStop.Click += delegate
-            {
-                CheckOnStartedRecord();
-                start = false;
-            };
+
+
+            buttonStart.Click += DefineAction;
+            radio_photo.Click += RadioButtonPhotoChange;
+            radio_video.Click += RadioButtonVideoChange;
+       
         }
 
 
-
-        public void CheckOnStartedRecord()
+   
+        
+        private void RadioButtonPhotoChange(object sender, EventArgs args)
         {
-            if (video.startRecord)
+            if (radio_photo.Checked)
             {
-                video.StopRecord();
-            }
-            else
+                radio_video.Checked = false;
+            }               
+        }
+
+        private void RadioButtonVideoChange(object sender, EventArgs args)
+        {
+            if (radio_video.Checked)
             {
-                video.Dispose();
-                video.ReleaseCamera();
+                radio_photo.Checked = false;
+                ShowDialog(DIALOG_TIME);
             }
         }
 
 
 
+        protected override Dialog OnCreateDialog(int id)
+        {
+            if (id == DIALOG_TIME)
+            {
+                TimePickerDialog dialogTime = new TimePickerDialog(this, TimePickerCallback, myHour, myMinute, true);
+                return dialogTime;
+            }
+            return base.OnCreateDialog(id);
+        }
+
+
+        private void TimePickerCallback(object sender, TimePickerDialog.TimeSetEventArgs e)
+        {
+            myHour = e.HourOfDay;
+            myMinute = e.Minute;
+            UpdateDisplay();
+        }
+
+        private void UpdateDisplay()
+        {
+           // string time = string.Format("{0}:{1}", hour, minute.ToString().PadLeft(2, '0'));
+           // time_display.Text = time;
+        }
         public string GetSessionName()
         {
             string sessionName = Intent.GetStringExtra("sessionName");
             if (sessionName == "")
                 sessionName = DateTime.Now.ToString();
             return sessionName;
+        }
+
+
+        private void DefineAction(object sender,EventArgs args)
+        {
+            StartVideoRecordOnRadioVideoChecked();
+            TakePictureOnRadioPhotoChecked();
+        }
+
+        private void StartVideoRecordOnRadioVideoChecked()
+        {
+            if (radio_video.Checked)
+            {
+                if (!isRecording)
+                    StartVideoRecord();
+                else
+                    StopVideoRecord();
+            }
+        }
+
+
+        private void TakePictureOnRadioPhotoChecked()
+        {
+            if (radio_photo.Checked)
+            {
+                camera.StartPreview();
+                camera.TakePicture(null, null, this);
+            }
+        }
+
+
+
+        public void OnPictureTaken(byte[] data, Android.Hardware.Camera camera)
+        {
+            Bitmap bitmapPicture = BitmapFactory.DecodeByteArray(data, 0, data.Length);
+            bitmapPicture = Bitmap.CreateScaledBitmap(bitmapPicture, Resources.DisplayMetrics.WidthPixels, Resources.DisplayMetrics.HeightPixels / 2, false);
+            Photo picture = new Photo(bitmapPicture, ".png", sessionPath);     
+        }
+
+        private void StartVideoRecord()
+        {
+            try
+            {
+                if (!cameraWasClosed)
+                    CameraClose(false);
+                video = new Video(sessionPath);
+                video.SufaceHolder = surfaceHolder;
+                video.StartRecord();
+                cameraWasClosed = true;
+                isRecording = true;
+                buttonStart.Text = GetString(Resource.String.stop_record);
+            }
+            catch { };
+        }
+
+
+
+        private void StopVideoRecord()
+        {
+            if (video.startRecord)
+            {
+                video.StopRecord();
+                isRecording = false;
+                buttonStart.Text = GetString(Resource.String.start_record);
+            }
         }
 
 
@@ -101,8 +196,6 @@ namespace HiddenCamera.Activities
         {
             if (!start)
                 camera = Android.Hardware.Camera.Open();
-            //camera.SetDisplayOrientation(90);
-
         }
 
 
@@ -112,9 +205,6 @@ namespace HiddenCamera.Activities
             CameraClose(true);
             previewing = false;
         }
-
-
-
 
 
 
@@ -140,8 +230,8 @@ namespace HiddenCamera.Activities
                 camera.Release();
                 camera = null;
             }
-
         }
+
 
         protected override void OnDestroy()
         {
@@ -149,45 +239,6 @@ namespace HiddenCamera.Activities
             if (video != null)
                 video.Dispose();
         }
-
-
-
-
-
-
-        public void StartTimer(ref Timer timer, ElapsedEventHandler Event)
-        {
-            timer = new Timer();
-            timer.Interval = 300;
-            timer.Elapsed += new ElapsedEventHandler(Event);
-            timer.Start();
-        }
-
-
-        private void timerUpdateVideoView_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            timerUpdateVideoView.Stop();
-            video.StartRecord();
-        }
-
-
-        private void StartVideoRecord()
-        {
-            try
-            {
-                if (!cameraWasClosed)
-                    CameraClose(false);
-                video = new Video(".mp4", sessionPath);
-                SurfaceView surfaceView = Photo.CreateSurfaceView(this);
-                layout.AddView(surfaceView);
-                video.SufaceHolder = surfaceView.Holder;
-                StartTimer(ref timerUpdateVideoView, timerUpdateVideoView_Elapsed);
-                cameraWasClosed = true;
-                start = true;
-            }
-            catch { };
-        }
-
 
 
     }
