@@ -22,14 +22,16 @@ namespace HiddenCamera.Activities
         private Button buttonStart;
         private LinearLayout layout;
         private RadioButton radio_video,radio_photo;
+        private Spinner spinner;
         private Video video;
         private Timer timerTakePicture;
         private ISurfaceHolder surfaceHolder;
         private Android.Hardware.Camera camera;
-        private bool previewing = false, cameraWasClosed = false, start = false, isRecording=false,isTakingPictures = false;
+        private bool previewing = false, cameraWasClosed = false, isRecording=false,isTakingPictures = false;
         private const int DIALOG_TIME = 11;
-
-
+        private Int64 interval = 0;
+        private const Int32 seconds = 60;
+        private const Int32 millisec = 1000;
         int myHour = 14;
         int myMinute = 35;
 
@@ -50,18 +52,30 @@ namespace HiddenCamera.Activities
             radio_photo.Click += RadioButtonPhotoChange;
             radio_video.Click += RadioButtonVideoChange;
 
+            InitSpinner();
+        }
+
+        private void InitSpinner()
+        {
             ArrayAdapter adapter = ArrayAdapter.CreateFromResource(this, Resource.Array.intervals_array, Resource.Layout.spinner_item);
-            Spinner spinner = (Spinner)FindViewById(Resource.Id.spinner1);
+            spinner = (Spinner)FindViewById(Resource.Id.spinner1);
             adapter.SetDropDownViewResource(Resource.Layout.spinner_dropdown_item);
             spinner.Adapter = adapter;
             spinner.ItemSelected += new EventHandler<AdapterView.ItemSelectedEventArgs>(spinner_ItemSelected);
+            spinner.Visibility = ViewStates.Invisible;
         }
+
+
+
 
         private void spinner_ItemSelected(object sender, AdapterView.ItemSelectedEventArgs e)
         {
             Spinner spinner = (Spinner)sender;
-            String   spinner.GetItemAtPosition(e.Position);
-            Toast.MakeText(this, toast, ToastLength.Long).Show();
+            String item =  spinner.GetItemAtPosition(e.Position).ToString();
+            interval = Int64.Parse(item.Split(' ')[0]) * millisec;
+            if (item.Contains("мин"))
+                interval *= seconds;
+            Toast.MakeText(this, String.Format("Интервал между снимками {0} ", item), ToastLength.Short).Show();
         }
    
         
@@ -70,6 +84,7 @@ namespace HiddenCamera.Activities
             if (radio_photo.Checked)
             {
                 radio_video.Checked = false;
+                spinner.Visibility = ViewStates.Visible;
             }               
         }
 
@@ -77,37 +92,16 @@ namespace HiddenCamera.Activities
         {
             if (radio_video.Checked)
             {
-                radio_photo.Checked = false;
-                ShowDialog(DIALOG_TIME);
-   
+                radio_photo.Checked = false;           
+                spinner.Visibility = ViewStates.Invisible;
             }
         }
 
 
 
-        protected override Dialog OnCreateDialog(int id)
-        {
-            if (id == DIALOG_TIME)
-            {
-                TimePickerDialog dialogTime = new TimePickerDialog(this, TimePickerCallback, myHour, myMinute, true);
-                return dialogTime;
-            }
-            return base.OnCreateDialog(id);
-        }
 
 
-        private void TimePickerCallback(object sender, TimePickerDialog.TimeSetEventArgs e)
-        {
-            myHour = e.HourOfDay;
-            myMinute = e.Minute;
-            UpdateDisplay();
-        }
 
-        private void UpdateDisplay()
-        {
-           // string time = string.Format("{0}:{1}", hour, minute.ToString().PadLeft(2, '0'));
-           // time_display.Text = time;
-        }
         public string GetSessionName()
         {
             string sessionName = Intent.GetStringExtra("sessionName");
@@ -186,6 +180,7 @@ namespace HiddenCamera.Activities
         private void StopTakingPictures()
         {
             timerTakePicture.Stop();
+            CameraClose(false);
             isTakingPictures = false;
             buttonStart.Text = GetString(Resource.String.start_record);
         }
@@ -193,7 +188,7 @@ namespace HiddenCamera.Activities
         public void StartTimer(ref Timer timer, ElapsedEventHandler Event)
         {
             timer = new Timer();
-            timer.Interval = 5000;
+            timer.Interval = interval;
             timer.Elapsed += new ElapsedEventHandler(Event);
             timer.Start();
         }
