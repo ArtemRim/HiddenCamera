@@ -11,4 +11,17 @@
   <string name="menu_open_mode">Съемка в режиме просмотра</string>
   <string name="start_record">Старт</string>
   <string name="stop_record">Стоп</string>
+  <string-array name="intervals_array">
+    <item>5 секунд</item>
+    <item>10 секунд</item>
+    <item>15 секунд</item>
+    <item>20 секунд</item>
+    <item>30 секунд</item>
+    <item>45 секунд</item>
+    <item>60 секунд</item>
+    <item>1 минуту</item>
+    <item>2 минуты</item>
+    <item>3 минуты</item>
+    <item>5 минут</item>
+  </string-array>
 </resources>

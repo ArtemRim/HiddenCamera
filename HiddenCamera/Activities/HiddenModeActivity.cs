@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using Android.App;
 using Android.Content;
 using Android.OS;
@@ -24,10 +23,10 @@ namespace HiddenCamera.Activities
         private LinearLayout layout;
         private RadioButton radio_video,radio_photo;
         private Video video;
-
+        private Timer timerTakePicture;
         private ISurfaceHolder surfaceHolder;
         private Android.Hardware.Camera camera;
-        private bool previewing = false, cameraWasClosed = false, start = false, isRecording=false;
+        private bool previewing = false, cameraWasClosed = false, start = false, isRecording=false,isTakingPictures = false;
         private const int DIALOG_TIME = 11;
 
 
@@ -50,10 +49,20 @@ namespace HiddenCamera.Activities
             buttonStart.Click += DefineAction;
             radio_photo.Click += RadioButtonPhotoChange;
             radio_video.Click += RadioButtonVideoChange;
-       
+
+            ArrayAdapter adapter = ArrayAdapter.CreateFromResource(this, Resource.Array.intervals_array, Resource.Layout.spinner_item);
+            Spinner spinner = (Spinner)FindViewById(Resource.Id.spinner1);
+            adapter.SetDropDownViewResource(Resource.Layout.spinner_dropdown_item);
+            spinner.Adapter = adapter;
+            spinner.ItemSelected += new EventHandler<AdapterView.ItemSelectedEventArgs>(spinner_ItemSelected);
         }
 
-
+        private void spinner_ItemSelected(object sender, AdapterView.ItemSelectedEventArgs e)
+        {
+            Spinner spinner = (Spinner)sender;
+            String   spinner.GetItemAtPosition(e.Position);
+            Toast.MakeText(this, toast, ToastLength.Long).Show();
+        }
    
         
         private void RadioButtonPhotoChange(object sender, EventArgs args)
@@ -70,6 +79,7 @@ namespace HiddenCamera.Activities
             {
                 radio_photo.Checked = false;
                 ShowDialog(DIALOG_TIME);
+   
             }
         }
 
@@ -124,25 +134,6 @@ namespace HiddenCamera.Activities
             }
         }
 
-
-        private void TakePictureOnRadioPhotoChecked()
-        {
-            if (radio_photo.Checked)
-            {
-                camera.StartPreview();
-                camera.TakePicture(null, null, this);
-            }
-        }
-
-
-
-        public void OnPictureTaken(byte[] data, Android.Hardware.Camera camera)
-        {
-            Bitmap bitmapPicture = BitmapFactory.DecodeByteArray(data, 0, data.Length);
-            bitmapPicture = Bitmap.CreateScaledBitmap(bitmapPicture, Resources.DisplayMetrics.WidthPixels, Resources.DisplayMetrics.HeightPixels / 2, false);
-            Photo picture = new Photo(bitmapPicture, ".png", sessionPath);     
-        }
-
         private void StartVideoRecord()
         {
             try
@@ -171,6 +162,61 @@ namespace HiddenCamera.Activities
             }
         }
 
+        private void TakePictureOnRadioPhotoChecked()
+        {
+            if (radio_photo.Checked)
+            {
+                if (!isTakingPictures)
+                    StartMakingPictures();
+                else
+                    StopTakingPictures();
+            }
+        }
+
+
+        private void StartMakingPictures()
+        {
+            StartTimer(ref timerTakePicture, timerTakePicture_Elapsed);
+            isTakingPictures = true;
+            buttonStart.Text = GetString(Resource.String.stop_record);
+        }
+
+
+
+        private void StopTakingPictures()
+        {
+            timerTakePicture.Stop();
+            isTakingPictures = false;
+            buttonStart.Text = GetString(Resource.String.start_record);
+        }
+
+        public void StartTimer(ref Timer timer, ElapsedEventHandler Event)
+        {
+            timer = new Timer();
+            timer.Interval = 5000;
+            timer.Elapsed += new ElapsedEventHandler(Event);
+            timer.Start();
+        }
+
+
+        private void timerTakePicture_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {           
+            TakePicture();
+        }
+
+        private void TakePicture()
+        {
+            camera.StartPreview();
+            camera.TakePicture(null, null, this);
+        }
+
+        public void OnPictureTaken(byte[] data, Android.Hardware.Camera camera)
+        {
+            Bitmap bitmapPicture = BitmapFactory.DecodeByteArray(data, 0, data.Length);
+            bitmapPicture = Bitmap.CreateScaledBitmap(bitmapPicture, Resources.DisplayMetrics.WidthPixels, Resources.DisplayMetrics.HeightPixels / 2, false);
+            Photo picture = new Photo(bitmapPicture, ".png", sessionPath);     
+        }
+
 
         public void SurfaceChanged(ISurfaceHolder holder, Format format, int width, int height)
         {
@@ -194,7 +240,7 @@ namespace HiddenCamera.Activities
 
         public void SurfaceCreated(ISurfaceHolder holder)
         {
-            if (!start)
+            if ((!isRecording)&&(!isTakingPictures))
                 camera = Android.Hardware.Camera.Open();
         }
 
@@ -202,8 +248,8 @@ namespace HiddenCamera.Activities
 
         public void SurfaceDestroyed(ISurfaceHolder holder)
         {
-            CameraClose(true);
-            previewing = false;
+           // CameraClose(true);
+           // previewing = false;
         }
 
 
